@@ -1,0 +1,18 @@
+---
+- name: Unmount raspbian boot partition
+  mount: 
+    path: "{{ raspbian_boot_mount_dir }}" 
+    state: unmounted
+  become: true
+
+- name: Unmount raspbian os partition
+  mount: 
+    path: "{{ raspbian_os_mount_dir }}"
+    state: unmounted
+  become: true
+
+- name: Clean data directory
+  file:
+    state: absent
+    path: "{{ project_data }}"
+...

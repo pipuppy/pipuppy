@@ -1,0 +1,7 @@
+---
+raspbian_image_archive: "{{ raspbian_name }}.zip"
+raspbian_image_dir: "{{ data_directory }}/{{ raspbian_image }}"
+raspbian_image_archive_dir:  "{{ data_directory }}/{{ raspbian_image_archive }}"
+raspbian_boot_mount_dir: "{{ data_directory }}/mount/boot"
+raspbian_os_mount_dir: "{{ data_directory }}/mount/os"
+...

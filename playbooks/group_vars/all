@@ -1,0 +1,4 @@
+pilab_state: present
+data_directory: "../.data"
+raspbian_name: "2017-11-29-raspbian-stretch-lite"
+raspbian_image: "{{ raspbian_name }}.img"

@@ -1,0 +1,86 @@
+---
+- name: Creating work directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items: 
+    - "{{ raspbian_os_mount_dir }}"
+    - "{{ raspbian_boot_mount_dir }}"
+
+- name: "Downloading and unzipping {{ raspbian_image_archive }} image archive"
+  unarchive:
+    src: "http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-12-01/{{ raspbian_image_archive }}"
+    dest: "{{ data_directory }}"
+    creates: "{{ raspbian_image_dir }}"
+    remote_src: yes
+
+# HOWTO: mount multiple partitions from single img file
+# https://goo.gl/cAcNdY
+- name: Finding raspbian boot partition offset in {{ raspbian_image }}}
+  shell: echo $(($(fdisk -u -l {{ raspbian_image_dir }} | awk /{{ raspbian_image}}1/'{print $2}') *512))
+  register: "boot_partition_offset"
+
+- name: Finding raspbian os partition offset in {{ raspbian_image }}}
+  shell: echo $(($(fdisk -u -l {{ raspbian_image_dir }} | awk /{{ raspbian_image}}2/'{print $2}') *512))
+  register: os_partition_offset 
+
+- name: Mount raspbian boot partition
+  mount: 
+    src: "{{ raspbian_image_dir }}" 
+    path: "{{raspbian_boot_mount_dir}}"
+    fstype: vfat
+    opts: "loop,rw,offset={{ boot_partition_offset.stdout }}"
+    state: mounted
+  become: true
+
+- name: Mount raspbian os partition
+  mount: 
+    src: "{{ raspbian_image_dir }}"
+    path: "{{ raspbian_os_mount_dir }}"
+    fstype: ext4
+    opts: "loop,rw,offset={{ os_partition_offset.stdout }}"
+    state: mounted
+  become: true
+
+- name: Enable ssh on raspbian
+  copy:
+    content: ""
+    dest: "{{ raspbian_boot_mount_dir }}/ssh"
+    force: no
+  become: true
+
+- name: Copy wifi credentials configuration
+  template:
+    src: wpa_supplicant.conf.j2
+    dest: "{{ raspbian_os_mount_dir }}/etc/wpa_supplicant/wpa_supplicant.conf"
+    owner: root
+    group: root
+    mode: "u=rw,g=,o="
+  become: true
+
+- name: Copy DHCP configuration
+  template:
+    src: "dhcpcd.conf.j2"
+    dest: "{{ raspbian_os_mount_dir }}/etc/dhcpcd.conf"
+    owner: root
+    group: syslog
+    mode: "u=rw,g=rw,o=r"
+  become: true
+
+- name: Copy SSHD configuration
+  template:
+    src: "sshd_config.j2"
+    dest: "{{ raspbian_os_mount_dir }}/etc/ssh/sshd_config"
+    owner: root
+    group: syslog
+    mode: "u=rw,g=r,o=r"
+  become: yes
+
+- name: Set authorized key for first user
+  authorized_key:
+    user: ubuntu
+    state: present
+    key: "{{ lookup('file', '/home/ubuntu/.ssh/id_rsa.pub' ) }}"
+    path: "{{ raspbian_os_mount_dir }}/home/pi/.ssh/authorized_keys"
+    manage_dir: no
+...

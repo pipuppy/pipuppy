@@ -1,0 +1,20 @@
+---
+
+- name: Unmounting SD card
+  shell: diskutil unmountDisk /dev/disk{{ sd_disk_number }}
+
+- name: Writing image in to SD card
+  shell: dd bs=1m if=../.data/{{ raspbian_image }} of=/dev/rdisk{{ sd_disk_number }}
+  become: true
+
+- name: Unmounting SD card
+  shell: diskutil unmountDisk /dev/disk{{ sd_disk_number }}
+
+
+- name: Wait for Raspberry PI to Boot
+  wait_for:
+    host: 192.168.0.88
+    port: 22
+    delay: 10
+    timeout: 600
+...

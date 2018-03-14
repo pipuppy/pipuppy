@@ -1,0 +1,6 @@
+---
+- include_tasks: present.yml
+  when: pilab_state == 'present'
+- include_tasks: absent.yml
+  when: pilab_state == 'absent'
+...

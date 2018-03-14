@@ -1,0 +1,30 @@
+---
+- hosts: all
+  gather_facts: No
+  tasks:
+    - 
+      name: Install python 2
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      become: true
+
+- hosts: control-machine
+  roles:
+    - 
+      role: raspbian-base-image
+      tags:
+        - image
+
+    - 
+      role: control-machine-bootstrap
+      tags:
+        - bootstrap
+
+
+- hosts: localhost
+  connection: local
+  roles: 
+  -
+    role: raspbian-image-write
+    tags:
+      - write-image
+...

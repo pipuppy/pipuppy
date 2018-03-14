@@ -1,0 +1,20 @@
+---
+- name: Create data directory
+  file: 
+    path: "{{ data_directory }}"
+    state: directory
+
+- name: Install "unzip" package
+  apt:
+    name: unzip
+    update_cache: No
+  become: Yes
+
+- name: Generate private an public ssh key pair for ubuntu user
+  user:
+    name: ubuntu
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: ".ssh/id_rsa"
+  become: Yes
+...

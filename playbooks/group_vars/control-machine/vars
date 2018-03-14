@@ -1,0 +1,2 @@
+wifi_ssid: PLACEBO
+wifi_psk: "{{ vault_wifi_psk }}"
