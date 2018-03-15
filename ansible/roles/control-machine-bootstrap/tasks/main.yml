@@ -17,4 +17,24 @@
     ssh_key_bits: 2048
     ssh_key_file: ".ssh/id_rsa"
   become: Yes
+
+- name: Copy CLI shell script
+  template:
+    src: cli.sh.j2
+    dest: "{{ data_directory }}/{{ project_name }}.sh"
+    owner: ubuntu
+    group: ubuntu
+    mode: "u=rwx,g=rx,o="
+
+- name:
+  debug:
+    msg: "{{playbook_dir}}/{{ data_directory }}/{{ project_name }}.sh"
+
+- name: Create executable symlink of cli shell script
+  file:
+    src: "{{playbook_dir}}/{{ data_directory }}/{{ project_name }}.sh"
+    dest: "/usr/local/bin/{{ project_name }}"
+    state: link
+  become: true
+
 ...

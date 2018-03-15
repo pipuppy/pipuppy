@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+ansible-playbook {{ playbook_dir }}/groundwork.yml -i {{ playbook_dir }}/inventory -t $@ --vault-id dev@{{ playbook_dir }}/.data/.vault_password

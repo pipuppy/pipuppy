@@ -13,18 +13,25 @@
       role: raspbian-base-image
       tags:
         - image
-
     - 
       role: control-machine-bootstrap
       tags:
         - bootstrap
 
+- hosts: gateway
+  gather_facts: No
+  roles:
+    -
+      role: wifi-access-point
+      tags:
+        - wifi-access-point
 
 - hosts: localhost
+  gather_facts: No
   connection: local
   roles: 
-  -
-    role: raspbian-image-write
-    tags:
-      - write-image
+    -
+      role: raspbian-image-write
+      tags:
+        - write-image
 ...

@@ -1,0 +1,61 @@
+---
+- name: Update apt cache
+  apt: 
+    update_cache: No 
+  become: Yes
+
+- name: Install "hostapd" package
+  apt:
+    name: hostapd
+  become: Yes
+
+- name: Install "dnsmasq" package
+  apt:
+    name: dnsmasq
+    update_cache: No
+  become: Yes
+
+- name: Copy hostapd deamon configuration
+  template:
+    src: hostapd.conf.j2
+    dest: /etc/hostapd/hostapd.conf
+    owner: root
+    group: root
+    mode: "u=rwx,g=xr,o=x"
+  become: Yes
+
+- name: Copy hostapd default configuration with reference to new configuration
+  template:
+    src: hostapd.j2
+    dest: /etc/default/hostapd
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  become: Yes
+
+- name: Copy hostapd start script
+  template:
+    src: hostapdstart.j2
+    dest: /usr/local/bin/hostapdstart
+    owner: root
+    group: root
+    mode: "u=rwx,g=rwx,o=rw"
+  become: Yes
+
+- name: Starting dnsmasq service
+  service: 
+    name: dnsmasq
+    state: restarted
+  become: Yes
+
+
+- name: Copy the rc.local script to run hostapdstart on boot up.
+  template:
+    src: rc.local.j2
+    dest: /etc/rc.local
+    owner: root
+    group: root
+    mode: "u=rwx,g=x,o=rx"
+  become: Yes
+
+...

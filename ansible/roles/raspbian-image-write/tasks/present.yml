@@ -4,7 +4,7 @@
   shell: diskutil unmountDisk /dev/disk{{ sd_disk_number }}
 
 - name: Writing image in to SD card
-  shell: dd bs=1m if=../.data/{{ raspbian_image }} of=/dev/rdisk{{ sd_disk_number }}
+  shell: dd bs=1m if={{ data_directory }}/{{ raspbian_image }} of=/dev/rdisk{{ sd_disk_number }}
   become: true
 
 - name: Unmounting SD card
